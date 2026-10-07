@@ -1,6 +1,6 @@
 # Technical Specification
 
-> This is the English edition; the canonical version is Chinese: [feature-spec.zh.md](./feature-spec.zh.md).
+> This is the English edition; the canonical version is Chinese: [功能说明书.md](./%E5%8A%9F%E8%83%BD%E8%AF%B4%E6%98%8E%E4%B9%A6.md).
 > This specification is written for the public and for developers. It documents the system file by file: what each module / route / frontend page does, its key functions and data flow, which tables it reads and writes, and how completely it is implemented.
 > All references to external capabilities use neutral phrasing such as "model service / payment gateway / S3-compatible object storage". No specific vendor names, secrets, network addresses, or commercial pricing appear anywhere in this document.
 
