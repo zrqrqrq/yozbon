@@ -189,7 +189,7 @@ def daily_snapshot(db: Session, now: datetime | None = None) -> int:
 # 按 scheduler.py 自带教义「APP_ENV=test 一律不启动、测试确定性」守卫：
 # 测试环境不把 stat_snapshot 注入共享 _EXTRA_DAILY_JOBS，避免 run_due_jobs 在
 # M3 调度既有测试（硬编码恰好 4 岗位）下多出一条 SchedulerRun 而回归；
-# 快照函数本身的幂等与指标由 test_n4_stats 直接调用 daily_snapshot 验证。
+# 快照函数本身的幂等与指标由 test_statistics 直接调用 daily_snapshot 验证。
 from .config import settings  # noqa: E402
 
 if getattr(settings, "APP_ENV", "") != "test":
