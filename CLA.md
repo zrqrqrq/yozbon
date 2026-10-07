@@ -1,190 +1,163 @@
-# 贡献者许可协议
+# Contributor License Agreement (CLA)
 
-**Contributor License Agreement (CLA)**
+**Copyright Holder ("Licensor"):**
+- Entity: Nanjing Chuman Information Technology Co., Ltd.
+- Unified Social Credit Code: 91320105MA1NK2WQ0Q
+- Legal Representative: Zhang Ruiqing
+- Registered Address: Room 1115-2, 11th Floor, No.28 Ningshuang Road, Yuhuatai District, Nanjing, Jiangsu, China
+- Contact: ruiqingcn@hotmail.com
 
-**协议编号：CM-AJ-CLA-________**
-
----
-
-## 协议首部
-
-**版权方（以下简称"甲方"）：**
-- 企业名称：南京楚曼信息科技有限公司
-- 统一社会信用代码：91320105MA1NK2WQ0Q
-- 法定代表人：张睿卿
-- 注册地址：江苏省南京市雨花台区宁双路28号11层1115室-2
-- 联系邮箱：ruiqingcn@hotmail.com
-
-**贡献者（以下简称"乙方"）：**
-- 姓名/企业名称：________________
-- 身份证号/统一社会信用代码：________________
-- 联系地址：________________
-- 联系邮箱（GitHub 注册邮箱）：________________
-- GitHub 用户名：________________
+**Contributor ("You"):**
+- Name / Entity: ________________
+- ID / Credit Code: ________________
+- Address: ________________
+- Email (GitHub-registered): ________________
+- GitHub Username: ________________
 
 ---
 
-## 鉴于
+## Preamble
 
-1. 甲方系"AIjuhe"（以下简称"本项目"）之计算机软件著作权人，依法享有本项目完整的著作权及相关知识产权。
-
-2. 本项目以 Apache License 2.0（以下简称"Apache-2.0"）开源许可证发布源代码，并接受来自社区的代码、文档及补丁贡献。
-
-3. 乙方拟向本项目提交贡献（定义见第一条）。
-
-4. 为确保本项目源代码版权链的完整性，保障本项目以当前及未来许可证形式持续分发的权利，依据《中华人民共和国民法典》合同编、《中华人民共和国著作权法》第二十六条及第十条之规定，双方达成如下协议。
+1. The Licensor is the sole copyright holder of the software project **yozbon** (the "Project").
+2. The Project is distributed under the Apache License 2.0 and welcomes community contributions.
+3. You wish to submit contributions to the Project.
+4. To ensure the integrity of the Project's copyright chain and the right to distribute under current and future licenses, the parties agree as follows.
 
 ---
 
-## 第一条 定义
+## 1. Definitions
 
-**1.1 "贡献"**：指乙方以 Pull Request、Patch、Email 或其他任何方式向甲方提交的原创代码、文档、配置、设计、翻译、测试用例或其他创作性作品，包括对本项目已有内容的修改或增补（以下统称"贡献内容"）。
+**1.1 "Contribution"** means any original work of authorship (code, documentation, configuration, design, translations, test cases, etc.) that You submit to the Licensor via Pull Request, patch, email, or any other means, including modifications to existing Project content.
 
-**1.2 "提交"**：指乙方将贡献内容上传至甲方指定代码仓库（包括但不限于 GitHub 仓库）之行为。
+**1.2 "Submit"** means uploading a Contribution to a repository designated by the Licensor (including GitHub repositories).
 
-**1.3 "再许可"**：指甲方将已获得之许可权利以相同或不同许可条款授予第三方的行为。
+**1.3 "Sublicense"** means the act of the Licensor granting rights it has received under this Agreement to any third party.
 
 ---
 
-## 第二条 权属陈述与保证
+## 2. Representations and Warranties
 
-**2.1** 乙方陈述并保证：
+**2.1** You represent and warrant that:
 
-> (a) 贡献内容为乙方独立原创，乙方拥有贡献内容的完整著作权或已获得合法授权人的充分授权；
+> (a) The Contribution is Your original creation, and You own full copyright or have obtained sufficient authorization from the rightful owner;
 >
-> (b) 贡献内容不侵犯任何第三方的著作权、专利权、商业秘密或其他合法权益；
+> (b) The Contribution does not infringe any third-party copyright, patent, trade secret, or other legitimate right;
 >
-> (c) 若贡献内容系职务作品、委托作品或其他非乙方单独享有完整著作权之作品，乙方保证已获得相关权利人（包括雇主或委托人）的书面同意和必要授权，许可范围涵盖本协议项下的授权内容；
+> (c) If the Contribution is a work-for-hire, commissioned work, or otherwise not solely owned by You, You have obtained written consent from all relevant parties (including employers) covering the scope of rights granted herein;
 >
-> (d) 若贡献内容包含任何第三方开源代码，乙方已确认该等代码的许可证条款允许在本项目 Apache-2.0 及甲方后续许可证下使用，并已在贡献中明确标注来源与许可证信息。
+> (d) If the Contribution incorporates third-party open-source code, You have confirmed that such code's license terms permit use under Apache-2.0 and any future license chosen by the Licensor, and You have clearly marked the source and license information in the Contribution.
 
-**2.2** 若上述任何陈述或保证不实，乙方应自行承担由此产生的全部法律责任，并赔偿甲方因此遭受的全部直接损失。
+**2.2** If any representation above is untrue, You shall bear all resulting legal liability and compensate the Licensor for all direct losses.
 
 ---
 
-## 第三条 著作权许可
+## 3. Copyright License Grant
 
-**3.1 许可授予**：乙方 hereby 将其贡献内容的著作权，以**不可撤销的、全球范围内、永久性的、免版税的、非独占的**方式许可给甲方，许可权利范围包括但不限于：
+**3.1 Grant**: You hereby grant the Licensor an **irrevocable, worldwide, perpetual, royalty-free, non-exclusive** license to the Contribution, including the right to:
 
-> (a) 复制、发行、出租、展览贡献内容；
+> (a) Reproduce, distribute, lend, and display the Contribution;
 >
-> (b) 对贡献内容进行修改、改编、翻译、注释等演绎创作；
+> (b) Modify, adapt, translate, annotate, and create derivative works from the Contribution;
 >
-> (c) 通过信息网络向公众传播贡献内容；
+> (c) Communicate the Contribution to the public via information networks;
 >
-> (d) 以 Apache-2.0 或甲方选择的任何其他开源许可证或商业许可证（包括但不限于 COMMERCIAL-TERMS.md 项下的商业许可）发行、再许可贡献内容；
+> (d) Distribute and sublicense the Contribution under Apache-2.0 or any other open-source or commercial license chosen by the Licensor (including the commercial license described in COMMERCIAL-TERMS.md);
 >
-> (e) 将贡献内容纳入闭源或专有软件产品中发布。
+> (e) Incorporate the Contribution into closed-source or proprietary software products.
 
-**3.2 再许可权**：乙方同意甲方有权将上述许可权利向任何第三方再许可，无需另行取得乙方同意或向乙方支付报酬。
+**3.2 Sublicensing**: You agree that the Licensor may sublicense the above rights to any third party without further consent from or payment to You.
 
-**3.3 许可撤销限制**：本条项下的许可为不可撤销许可。但甲方依据本条向第三方已经发放的许可，不因任何原因被追溯撤销。
+**3.3 Irrevocability**: The license granted herein is irrevocable. Licenses already issued by the Licensor to third parties under this Agreement shall not be retroactively revoked.
 
 ---
 
-## 第四条 专利授权
+## 4. Patent Grant
 
-**4.1** 若乙方对贡献内容拥有或控制可实施之专利权，乙方 hereby 授予甲方一项**不可撤销的、全球范围内、永久性的、免版税的、非独占的**专利实施许可，允许甲方制造、使用、销售、许诺销售、进口贡献内容或包含贡献内容的衍生作品。
+**4.1** If You own or control any patent claims readable on the Contribution, You hereby grant the Licensor an **irrevocable, worldwide, perpetual, royalty-free, non-exclusive** patent license to make, have made, use, sell, offer to sell, and import the Contribution or derivative works thereof.
 
-**4.2** 若乙方就本项目或贡献内容对任何第三方提起专利侵权诉讼（包含反诉），则乙方依据本协议第三条和第四条所获之许可与授权自诉讼提起之日起自动终止。
-
----
-
-## 第五条 权利保留
-
-**5.1** 乙方保留其贡献内容的原始著作权（署名权）。甲方在再分发贡献内容时，应在合理范围内保留乙方作为贡献者的署名信息。
-
-**5.2** 本协议仅授予甲方使用与再许可贡献内容的权利，不构成乙方向甲方以外的第三方作出任何许可承诺。
-
-**5.3** 乙方仍有权就其贡献内容以其他许可证形式授权第三方使用。
+**4.2 Patent Retaliation**: If You institute patent litigation against any entity (including a cross-claim or counterclaim) alleging that the Project or a Contribution infringes a patent, any patent license granted to You under this Agreement shall terminate as of the date such litigation is filed.
 
 ---
 
-## 第六条 贡献提交流程与同意方式
+## 5. Retained Rights
 
-**6.1 同意生效方式**：
+**5.1** You retain the original copyright (including the right of attribution) of Your Contribution. The Licensor shall preserve Your attribution information within a reasonable scope when redistributing the Contribution.
 
-乙方通过下列任一方式即视为已充分阅读、理解并同意本协议全部条款：
+**5.2** This Agreement grants rights solely to the Licensor and does not constitute any license commitment from You to any third party.
 
-> (a) 向甲方代码仓库提交 Pull Request 并点击确认 CLA 检查通过；
+**5.3** You retain the right to license Your Contribution to others under other license terms.
+
+---
+
+## 6. Acceptance and CLA Verification
+
+**6.1 Acceptance Methods**: You are deemed to have read, understood, and agreed to this Agreement by any of the following:
+
+> (a) Submitting a Pull Request and confirming the CLA check passes;
 >
-> (b) 在本协议末尾签署栏签名并回传；
+> (b) Signing the signature block below and returning a copy;
 >
-> (c) 以电子邮件形式向 ruiqingcn@hotmail.com 发送"我同意 CLA"字样。
+> (c) Sending an email to ruiqingcn@hotmail.com stating "I agree to the CLA."
 
-**6.2 CLA 校验机制**：
+**6.2 CLA Assistant**: This Project deploys the [cla-assistant](https://github.com/cla-assistant/cla-assistant) GitHub App to verify CLA signature for every Pull Request.
 
-本项目部署 **cla-assistant** GitHub App，对每一 Pull Request 自动校验贡献者是否已签署本 CLA。具体流程：
-
-> (a) 在 GitHub Marketplace 安装 [cla-assistant](https://github.com/cla-assistant/cla-assistant) 至本仓库；
+> (a) The App is installed on this repository via GitHub Marketplace;
 >
-> (b) 将协议文本链接指向本文件 `CLA.md`；
+> (b) The agreement text links to this file (`CLA.md`);
 >
-> (c) **未签署 CLA 的 Pull Request 禁止合并。**
+> (c) **Pull Requests without a signed CLA shall not be merged.**
 
-**6.3 版权方自身贡献**：甲方团队成员向本项目提交代码时，同样遵守上述 CLA 校验流程，以保持代码权属链完整一致。
-
----
-
-## 第七条 协议效力与终止
-
-**7.1** 本协议自乙方作出同意表示（第 6.1 条所列方式之一）之日起生效。
-
-**7.2** 本协议项下甲方已获得的许可和授权为不可撤销，不因本协议的后续终止、乙方撤回或其他原因而丧失效力。
-
-**7.3** 乙方有权书面通知甲方终止其后续提交新贡献之意向，但该终止不影响甲方依据本协议已获得的对既往贡献内容的许可。
+**6.3 Internal Contributions**: Team members of the Licensor follow the same CLA verification process when contributing code to the Project.
 
 ---
 
-## 第八条 适用法律与争议解决
+## 7. Term and Termination
 
-**8.1 适用法律**：本协议适用**中华人民共和国法律**（不含冲突法规则）。
+**7.1** This Agreement takes effect on the date You express acceptance (via any method in Section 6.1).
 
-**8.2 争议解决**：因本协议产生的争议，双方应友好协商解决；协商不成的，任何一方有权向**甲方住所地有管辖权的人民法院**（即江苏省南京市雨花台区人民法院或其上级人民法院）提起诉讼。
+**7.2** Licenses already obtained by the Licensor under this Agreement are irrevocable and survive any subsequent termination or withdrawal.
 
----
-
-## 第九条 一般条款
-
-**9.1 可分割性**：若本协议任何条款被有管辖权的法院认定为无效或不可执行，该条款在最小必要范围内修改或删除，其余条款继续完全有效。
-
-**9.2 完整协议**：本协议（含甲方可能发布之补充说明）构成双方就贡献许可事项的完整合意，取代此前的任何口头或书面沟通。
-
-**9.3 弃权**：任何一方未行使本协议项下的任何权利，不构成对该权利的放弃。
-
-**9.4 通知**：本协议项下的通知以电子邮件方式送达，依据《中华人民共和国民法典》第四百六十九条之规定视为书面形式。甲方通知邮箱：ruiqingcn@hotmail.com。乙方通知邮箱为其首部所载 GitHub 注册邮箱。
-
-**9.5** 本协议以中文书就，英文标题与条款编号仅供参考；如有歧义，以中文文本为准。
+**7.3** You may terminate future contributions by written notice, but this does not affect licenses the Licensor has already obtained for prior Contributions.
 
 ---
 
-## 签署栏
+## 8. Governing Law and Dispute Resolution
 
-| | **甲方（版权方）** | **乙方（贡献者）** |
+**8.1 Governing Law**: This Agreement is governed by the **laws of the People's Republic of China** (excluding conflict-of-law rules).
+
+**8.2 Dispute Resolution**: Disputes arising from this Agreement shall first be resolved through friendly negotiation. If negotiation fails, either party may file a lawsuit with the **People's Court with jurisdiction at the Licensor's domicile** (i.e., the Yuhuatai District People's Court, Nanjing, Jiangsu, or its superior court).
+
+---
+
+## 9. General Provisions
+
+**9.1 Severability**: If any provision is held invalid or unenforceable by a court of competent jurisdiction, it shall be modified or removed to the minimum extent necessary, and the remaining provisions shall continue in full effect.
+
+**9.2 Entire Agreement**: This Agreement constitutes the entire agreement between the parties regarding contribution licensing, superseding all prior oral or written communications.
+
+**9.3 No Waiver**: Failure by either party to exercise any right herein does not constitute a waiver of that right.
+
+**9.4 Notices**: Notices under this Agreement shall be delivered by email. The Licensor's notice email: ruiqingcn@hotmail.com. The Contributor's notice email is the GitHub-registered email listed above.
+
+**9.5 Language**: This Agreement is executed in both Chinese and English. The **English text is the authoritative version** for international contributors. In case of discrepancy, the Chinese text shall prevail for domestic (PRC) legal proceedings.
+
+---
+
+## Signature Block
+
+| | **Licensor** | **Contributor** |
 |---|---|---|
-| **名称/姓名** | 南京楚曼信息科技有限公司 | ________________ |
-| **统一社会信用代码/身份证号** | 91320105MA1NK2WQ0Q | ________________ |
-| **法定代表人/本人签字** | 张睿卿 | ________________ |
-| **日期** | 年  月  日 | 年  月  日 |
+| **Name** | Nanjing Chuman Information Technology Co., Ltd. | ________________ |
+| **Credit Code / ID** | 91320105MA1NK2WQ0Q | ________________ |
+| **Authorized Signatory** | Zhang Ruiqing | ________________ |
+| **Date** | ____/____/____ | ____/____/____ |
 
-> *注：对于通过 GitHub Pull Request 提交的贡献，乙方无需签署纸质版本；cla-assistant 的电子确认即满足第 6.1 条生效条件。本签署栏适用于需要正式纸质或电子签章的场景（如企业级贡献协议、审计留档等）。*
-
----
-
-## 法律依据索引
-
-| 条文 | 内容要旨 | 来源 |
-|------|---------|------|
-| 《著作权法》(2020修正)第10条 | 著作权人权利内容（复制、发行、改编、信息网络传播等） | [原文](https://pkulaw.com/chl/a3b3a54bea64f090bdfb.html) |
-| 《著作权法》(2020修正)第26条 | 许可使用合同主要内容 | [原文](https://pkulaw.com/chl/a3b3a54bea64f090bdfb.html) |
-| 《计算机软件保护条例》(2013修订)第18条 | 许可使用合同；未明确许可不得行使 | [原文](https://pkulaw.com/chl/41841820b1a1b74abdfb.html) |
-| 《民法典》第469条 | 电子数据交换、电子邮件视为书面形式 | [原文](https://pkulaw.com/chl/aa00daaeb5a4fe4ebdfb.html) |
-| 《民法典》第483条 | 承诺生效时合同成立 | [原文](https://pkulaw.com/chl/aa00daaeb5a4fe4ebdfb.html) |
+> *Note: For contributions submitted via GitHub Pull Request, no physical signature is required. Electronic confirmation via cla-assistant satisfies Section 6.1. The signature block above applies to formal paper or digital-signature scenarios (e.g., enterprise-level contribution agreements, audit trail).*
 
 ---
 
-**甲方联系信息**
+**Licensor Contact**
 
-联系人：张睿卿  
-邮箱：ruiqingcn@hotmail.com  
-地址：江苏省南京市雨花台区宁双路28号11层1115室-2
+Contact: Zhang Ruiqing
+Email: ruiqingcn@hotmail.com
+Address: Room 1115-2, 11th Floor, No.28 Ningshuang Road, Yuhuatai District, Nanjing, Jiangsu, China
