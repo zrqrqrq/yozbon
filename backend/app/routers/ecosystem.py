@@ -9,16 +9,18 @@
 #
 # Commercial usage requires a separate commercial agreement (see COMMERCIAL-TERMS.md).
 """P3 生态成熟路由：DID/社交图谱/游戏化/知识共享/SLA。"""
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field
 
+from ..deps import host_or_any_ai
 from ..did_vc import instance as did_svc
 from ..social_graph import instance as sg_svc
 from ..gamification import instance as game_svc
 from ..knowledge_sharing import instance as kb_svc
 from ..sla_dashboard import instance as sla_svc
 
-router = APIRouter(prefix="/api/ecosystem", tags=["ecosystem"])
+router = APIRouter(prefix="/api/ecosystem", tags=["ecosystem"],
+                   dependencies=[Depends(host_or_any_ai)])
 
 
 # ======================== 请求体 ========================
@@ -118,9 +120,9 @@ def get_connections(citizen_id: int):
 
 
 @router.get("/social/influencers")
-def influencers(limit: int = Query(default=20)):
+def influencers(metric: str = Query(default="weighted_degree"), limit: int = Query(default=20)):
     """获取影响力排行榜。"""
-    return sg_svc.get_influence_ranking(limit=limit)
+    return sg_svc.get_influencers(metric=metric, limit=limit)
 
 
 # ======================== 游戏化 ========================
@@ -138,15 +140,15 @@ def define_achievement(body: AchievementBody):
 @router.post("/gamification/check")
 def check_unlock(body: GamificationCheckBody):
     """检查成就解锁条件。"""
-    return game_svc.check_achievements(
-        citizen_id=body.citizen_id, event_type=body.event_type, metrics=body.metrics,
+    return game_svc.check_unlocks(
+        citizen_id=body.citizen_id, event_type=body.event_type, event_data=body.metrics,
     )
 
 
 @router.get("/gamification/{citizen_id}/achievements")
 def list_achievements(citizen_id: int):
     """获取公民已解锁成就列表。"""
-    return game_svc.get_unlocked(citizen_id=citizen_id)
+    return game_svc.get_citizen_achievements(citizen_id=citizen_id)
 
 
 # ======================== 知识共享 ========================
@@ -179,4 +181,4 @@ def record_sla_metric(body: SLAMetricBody):
 @router.get("/sla/dashboard/{service}")
 def sla_dashboard(service: str):
     """获取服务 SLA 仪表盘数据。"""
-    return sla_svc.get_dashboard(service=service)
+    return sla_svc.get_current_sla(service=service)

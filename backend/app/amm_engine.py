@@ -326,4 +326,21 @@ class AMMEngine:
             db.close()
 
 
+    def get_pool(self, pool_id: int) -> dict:
+        """查询流动性池状态。"""
+        db = SessionLocal()
+        try:
+            pool = db.get(AMMPool, pool_id)
+            if pool is None:
+                return {"error": "pool not found"}
+            return {
+                "pool_id": pool.id, "token_a": pool.token_a, "token_b": pool.token_b,
+                "reserve_a": pool.reserve_a, "reserve_b": pool.reserve_b,
+                "fee_rate": pool.fee_rate, "lp_token_supply": pool.lp_token_supply,
+                "volume_24h": pool.volume_24h, "is_active": bool(pool.is_active),
+            }
+        finally:
+            db.close()
+
+
 instance = AMMEngine()

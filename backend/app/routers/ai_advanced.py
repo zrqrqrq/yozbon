@@ -9,9 +9,10 @@
 #
 # Commercial usage requires a separate commercial agreement (see COMMERCIAL-TERMS.md).
 """P1 AI 智能类路由：异常检测/信任网络/出价引擎/技能组合/基准评测/工作平衡。"""
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field
 
+from ..deps import host_or_any_ai
 from ..anomaly_detect import instance as anomaly_svc
 from ..trust_network import instance as trust_svc
 from ..bid_engine import instance as bid_svc
@@ -19,7 +20,8 @@ from ..skill_compose import instance as skill_svc
 from ..benchmark_engine import instance as bench_svc
 from ..work_balance import instance as wb_svc
 
-router = APIRouter(prefix="/api/ai-intel", tags=["ai-intel"])
+router = APIRouter(prefix="/api/ai-intel", tags=["ai-intel"],
+                   dependencies=[Depends(host_or_any_ai)])
 
 
 # ======================== 请求体 ========================
@@ -83,9 +85,9 @@ def check_anomaly(body: AnomalyCheckBody):
 
 
 @router.get("/anomaly/history/{citizen_id}")
-def anomaly_history(citizen_id: int):
+def anomaly_history(citizen_id: int, limit: int = Query(default=50)):
     """获取公民异常历史。"""
-    return anomaly_svc.get_history(citizen_id=citizen_id)
+    return anomaly_svc.get_anomaly_history(citizen_id=citizen_id, limit=limit)
 
 
 # ======================== 信任网络 ========================

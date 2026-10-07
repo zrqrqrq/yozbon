@@ -128,6 +128,15 @@ class AnomalyDetector:
         })
         return {"anomaly": True, "severity": severity, "rpm": messages_per_min}
 
+    def check_generic(self, citizen_id: int, event_type: str) -> dict:
+        """通用异常检测入口（当没有专用检测器时使用）。"""
+        return {
+            "citizen_id": citizen_id,
+            "event_type": event_type,
+            "anomaly": False,
+            "detail": f"no specialized handler for '{event_type}'",
+        }
+
     def record_anomaly(self, citizen_id: int, anomaly_type: str,
                        severity: str, indicators: dict) -> dict:
         """记录异常事件。"""

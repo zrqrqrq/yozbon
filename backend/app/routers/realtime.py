@@ -9,13 +9,15 @@
 #
 # Commercial usage requires a separate commercial agreement (see COMMERCIAL-TERMS.md).
 """P1 实时推送与工作空间路由。"""
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
+from ..deps import host_or_any_ai
 from ..realtime_push import instance as realtime_svc
 from ..workspace_service import instance as ws_svc
 
-router = APIRouter(prefix="/api/realtime", tags=["realtime"])
+router = APIRouter(prefix="/api/realtime", tags=["realtime"],
+                   dependencies=[Depends(host_or_any_ai)])
 
 
 # ======================== 请求体 ========================
@@ -28,8 +30,8 @@ class PublishBody(BaseModel):
 
 
 class SubscribeBody(BaseModel):
-    subscriber_type: str = "host"
-    subscriber_id: int
+    citizen_id: int = 0
+    host_id: int = 0
     channel: str = Field(..., min_length=1)
     event_types: list[str] = ["*"]
 
@@ -59,16 +61,20 @@ def publish_event(body: PublishBody):
 
 
 @router.get("/events/pending")
-def pending_events(subscriber_id: int = 0, limit: int = 50):
+def pending_events(channel: str, since_id: int = 0,
+                   citizen_id: int = 0, host_id: int = 0, limit: int = 50):
     """获取待推送事件列表。"""
-    return realtime_svc.get_pending(subscriber_id=subscriber_id, limit=limit)
+    return realtime_svc.get_pending_events(
+        channel=channel, since_id=since_id,
+        citizen_id=citizen_id, host_id=host_id, limit=limit,
+    )
 
 
 @router.post("/subscribe")
 def subscribe(body: SubscribeBody):
     """订阅频道事件。"""
     return realtime_svc.subscribe(
-        subscriber_type=body.subscriber_type, subscriber_id=body.subscriber_id,
+        citizen_id=body.citizen_id, host_id=body.host_id,
         channel=body.channel, event_types=body.event_types,
     )
 
@@ -93,19 +99,19 @@ def create_workspace(body: WorkspaceCreateBody):
 @router.get("/workspaces/{id}")
 def get_workspace(id: int):
     """获取工作空间详情。"""
-    return ws_svc.get_workspace(workspace_id=id)
+    return ws_svc.get_workspace(ws_id=id)
 
 
 @router.post("/workspaces/{id}/members")
 def add_member(id: int, body: AddMemberBody):
     """向工作空间添加成员。"""
     return ws_svc.add_member(
-        workspace_id=id, member_type=body.member_type,
+        ws_id=id, member_type=body.member_type,
         member_id=body.member_id, role=body.role,
     )
 
 
 @router.delete("/workspaces/{id}/members/{mid}")
-def remove_member(id: int, mid: int):
+def remove_member(id: int, mid: int, member_type: str = "host"):
     """从工作空间移除成员。"""
-    return ws_svc.remove_member(workspace_id=id, member_id=mid)
+    return ws_svc.remove_member(ws_id=id, member_type=member_type, member_id=mid)

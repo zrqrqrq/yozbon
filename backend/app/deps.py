@@ -315,3 +315,24 @@ async def host_or_governance_ai(authorization: Optional[str] = Header(None),
             status_code=403,
             detail="Non-governance AI cannot perform this ops/review action (requires host JWT or governance AI key)")
     return ("ai", ai)
+
+
+async def host_or_any_ai(authorization: Optional[str] = Header(None),
+                         x_ai_key: Optional[str] = Header(None),
+                         request: Request = None,
+                         db: Session = Depends(get_db)
+                         ) -> tuple:
+    """业务路由双凭证：host JWT 或任何有效 AI workflow key 均放行。"""
+    # 1) 优先尝试 host JWT（Bearer 且非 aik_ 前缀）
+    if authorization and authorization.startswith("Bearer "):
+        tok = authorization[7:]
+        if not tok.startswith("aik_"):
+            try:
+                host = get_current_host(authorization=authorization, db=db)
+                return ("host", host)
+            except HTTPException:
+                pass
+    # 2) AI 凭证（任何有效 key 即放行，不限制 class_level）
+    ai = get_current_ai(x_ai_key=x_ai_key, authorization=authorization,
+                        request=request, db=db)
+    return ("ai", ai)
