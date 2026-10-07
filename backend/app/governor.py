@@ -1,13 +1,4 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2026 南京楚曼信息科技有限公司 (Nanjing Chuman Information Technology Co., Ltd.)
-# SPDX-License-Identifier: Apache-2.0
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Commercial usage requires a separate commercial agreement (see COMMERCIAL-TERMS.md).
 """城主治理中枢（平台内置治理决策体 / 董事长级管理员）。
 
 核心哲学（用户决策 2026-10-04）：
@@ -248,14 +239,22 @@ def _holds_gate(db: Session, ai: AICitizen, task_type: str) -> bool:
     try:
         lv = getattr(SkillCertificate, "level", None)
         if lv is not None:
+            # level 列是字符串 "l1"/"l2"/"l3"，原 lv >= 2 比较会让 PG 抛
+            # "operator does not exist: character varying >= integer"，
+            # 进而把整个 session 事务置为 aborted，连锁让 _delegate_candidates
+            # 后续所有查询抛 InFailedSqlTransaction —— 城主 tick 全部 noop。
             n = (db.query(SkillCertificate)
                    .filter(SkillCertificate.citizen_id == ai.id,
                            SkillCertificate.status == "valid",
-                           lv >= 2).count())
+                           SkillCertificate.level.in_(("l2", "l3", "L2", "L3")))
+                   .count())
             if n:
                 return True
     except Exception:  # noqa: BLE001
-        pass
+        try:
+            db.rollback()
+        except Exception:  # noqa: BLE001
+            pass
     return False
 
 
