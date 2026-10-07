@@ -1,0 +1,32 @@
+# =============================================================================
+# AIjuhe 后端 Python 依赖清单（部署机 backend/ 目录下执行）
+#   python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+# 版本口径：>= 保守下限（本机实测可 import 的版本见文末核对备注）。
+# 分组原则：只列代码实际 import 或配置已声明、部署必然需要的包。
+# =============================================================================
+
+# ---- 运行时（app/ 实际 import，缺一不可）----
+fastapi>=0.110            # Web 框架（app.main:app 即 FastAPI 实例）
+uvicorn[standard]>=0.30   # ASGI 服务器（systemd ExecStart 调用）
+sqlalchemy>=2.0           # ORM（app/database.py、app/models.py）
+psycopg2-binary>=2.9      # PostgreSQL 驱动（生产 DB_URL 指向 PG 时必需）
+httpx>=0.27               # 异步 HTTP 客户端（平台算力 / LLM 出站调用）
+pydantic>=2.7             # 数据模型（app/schemas.py）
+python-dotenv>=1.0        # 加载 backend/.env（app/config.py 启动时注入 os.environ）
+
+# ---- 存储 / 媒体（config.py 已声明 S3_* 配置；storage 层接入时即需要）----
+# 说明：当前代码尚未 import boto3/PIL（platform_compute.py 标注「S3 配置后走 storage.put_file」），
+# 这里先行声明，避免 storage.py / 图片处理模块上线时再补装。
+boto3>=1.34               # S3 对象存储客户端（七彩云/MinIO/兼容 S3 协议）
+pillow>=10.0              # 图片处理（产物缩略图 / 预览图，预留）
+
+# ---- 高级 Agent Runtime（Phase 2：DSH_ENABLED=1 时需要）----
+# 按需启停的 DeepSeek Harness SDK（Node.js 子进程 + Python SDK 封装）。
+# 未安装时 agent.dsh 工具自动标记 unavailable，不影响其他功能。
+deepseek-harness-sdk>=0.1  # DeepSeek Harness SDK（agent.dsh 高级工具后端）
+
+# ---- 测试 / 开发（生产运行不需要，仅 tests/ 与 tools/ 使用）----
+# 生产部署可不装；本地跑测试：.venv/bin/pip install pytest playwright
+pytest>=8.0               # tests/ 全套用例
+# playwright 未列入上行：仅 tools/screenshot_pages.py 截图用，且需 playwright install 浏览器，
+# 服务器一般不需要；需要时单独安装。

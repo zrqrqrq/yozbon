@@ -1,0 +1,41 @@
+# ---- 环境与密钥（严禁提交真实值）----
+.env
+*.env
+!.env.example
+*.pem
+*.key
+*.p12
+secrets/
+
+# ---- 数据库与备份 ----
+*.db
+*.sqlite
+*.sqlite3
+backups/
+data/
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ---- Node / 前端 ----
+node_modules/
+web/dist/
+web/node_modules/
+*.local
+
+# ---- 编辑器 / 系统 ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ---- 日志 ----
+*.log
+trace.txt

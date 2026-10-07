@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>yozbon — AI 工作流自动化工具 | Automate Your Digital Work</title>
+<meta name="description" content="yozbon 是一款 AI 工作流自动化工具。在你的授权下自动完成开发、测试、设计与文案等日常数字任务。按月订阅，随时取消。">
+<style>
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-card: #1a1a2e;
+  --bg-card-hover: #22223a;
+  --text-primary: #e8e8f0;
+  --text-secondary: #9898b0;
+  --text-muted: #6a6a82;
+  --accent-primary: #6c5ce7;
+  --accent-secondary: #a855f7;
+  --accent-glow: rgba(108, 92, 231, 0.3);
+  --accent-warm: #f59e0b;
+  --accent-green: #10b981;
+  --accent-red: #ef4444;
+  --border-color: rgba(108, 92, 231, 0.2);
+  --border-subtle: rgba(255,255,255,0.06);
+  --radius: 12px;
+  --radius-lg: 20px;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--accent-primary); border-radius: 4px; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+/* Language Toggle */
+.lang-toggle {
+  position: fixed; top: 20px; right: 20px; z-index: 1000;
+  display: flex; background: rgba(26, 26, 46, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 8px; overflow: hidden;
+}
+.lang-toggle button {
+  background: transparent; border: none; color: var(--text-secondary);
+  padding: 8px 16px; cursor: pointer; font-size: 14px; font-family: inherit;
+  transition: all 0.2s;
+}
+.lang-toggle button.active { background: var(--accent-primary); color: #fff; }
+
+/* Hero */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  text-align: center; padding: 120px 24px 80px;
+  position: relative;
+  background: radial-gradient(ellipse at 50% 0%, rgba(108,92,231,0.15), transparent 60%);
+}
+.hero-badge {
+  display: inline-block; padding: 6px 16px; margin-bottom: 28px;
+  background: rgba(108,92,231,0.12); border: 1px solid var(--border-color);
+  border-radius: 999px; font-size: 13px; color: var(--accent-secondary);
+  letter-spacing: 0.5px;
+}
+.hero h1 {
+  font-size: clamp(2.2rem, 6vw, 4rem); font-weight: 800; line-height: 1.15;
+  max-width: 900px; margin-bottom: 24px;
+  background: linear-gradient(135deg, #fff 0%, #b8b8d8 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero-subtitle {
+  font-size: clamp(1rem, 2vw, 1.25rem); color: var(--text-secondary);
+  max-width: 720px; margin-bottom: 40px;
+}
+.cta-btn {
+  display: inline-block; padding: 16px 40px;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  color: #fff; text-decoration: none; border-radius: var(--radius);
+  font-size: 1.05rem; font-weight: 600; transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 8px 30px var(--accent-glow);
+}
+.cta-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px var(--accent-glow); }
+
+/* Sections */
+section { padding: 90px 0; }
+.section-title {
+  font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 700; text-align: center;
+  margin-bottom: 16px;
+}
+.section-lead { text-align: center; color: var(--text-secondary); max-width: 640px; margin: 0 auto 56px; }
+
+/* Features grid */
+.features-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+}
+.feature-card {
+  background: var(--bg-card); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg); padding: 32px; transition: all 0.25s;
+}
+.feature-card:hover { background: var(--bg-card-hover); border-color: var(--border-color); transform: translateY(-3px); }
+.feature-icon { font-size: 2rem; margin-bottom: 16px; }
+.feature-card h3 { font-size: 1.2rem; margin-bottom: 10px; }
+.feature-card p { color: var(--text-secondary); font-size: 0.95rem; }
+
+/* Steps */
+.steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; }
+.step {
+  background: var(--bg-card); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg); padding: 32px 24px; position: relative;
+}
+.step-num {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; margin-bottom: 18px;
+}
+.step h3 { font-size: 1.1rem; margin-bottom: 8px; }
+.step p { color: var(--text-secondary); font-size: 0.92rem; }
+
+/* Comparison table */
+.comparison-wrap { overflow-x: auto; }
+.comparison {
+  width: 100%; border-collapse: collapse; min-width: 600px;
+  background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden;
+}
+.comparison th, .comparison td { padding: 18px 20px; text-align: left; border-bottom: 1px solid var(--border-subtle); }
+.comparison th { background: var(--bg-secondary); font-size: 0.9rem; color: var(--text-secondary); }
+.comparison td:first-child { color: var(--text-secondary); font-weight: 500; }
+.comparison .hl { color: var(--accent-secondary); font-weight: 600; }
+
+/* Pricing */
+.pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; max-width: 900px; margin: 0 auto; }
+.price-card {
+  background: var(--bg-card); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg); padding: 36px 32px; text-align: center;
+}
+.price-card.featured { border-color: var(--accent-primary); box-shadow: 0 0 40px var(--accent-glow); }
+.price-card h3 { font-size: 1.2rem; margin-bottom: 8px; }
+.price-tag { font-size: 2.4rem; font-weight: 800; margin: 12px 0; }
+.price-tag span { font-size: 1rem; color: var(--text-muted); font-weight: 400; }
+.price-card ul { list-style: none; text-align: left; margin: 24px 0; }
+.price-card li { padding: 8px 0; color: var(--text-secondary); font-size: 0.92rem; }
+.price-card li::before { content: '✓ '; color: var(--accent-green); font-weight: 700; }
+
+/* FAQ */
+.faq-list { max-width: 760px; margin: 0 auto; }
+.faq-item { border: 1px solid var(--border-subtle); border-radius: var(--radius); margin-bottom: 12px; overflow: hidden; }
+.faq-question {
+  width: 100%; text-align: left; background: var(--bg-card); border: none;
+  color: var(--text-primary); padding: 20px 24px; font-size: 1rem; font-weight: 600;
+  cursor: pointer; font-family: inherit; display: flex; justify-content: space-between; align-items: center;
+}
+.faq-question::after { content: '+'; color: var(--accent-secondary); font-size: 1.4rem; transition: transform 0.2s; }
+.faq-item.open .faq-question::after { transform: rotate(45deg); }
+.faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+.faq-answer p { padding: 0 24px 20px; color: var(--text-secondary); font-size: 0.95rem; }
+.faq-item.open .faq-answer { max-height: 420px; }
+
+/* Compliance */
+.compliance {
+  background: var(--bg-secondary); border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.compliance-box {
+  max-width: 760px; margin: 0 auto; padding: 28px 32px;
+  background: var(--bg-card); border-left: 3px solid var(--accent-warm);
+  border-radius: var(--radius); font-size: 0.9rem; color: var(--text-secondary);
+}
+
+/* Footer CTA */
+.footer-cta { text-align: center; padding: 100px 24px; background: radial-gradient(ellipse at 50% 100%, rgba(108,92,231,0.15), transparent 60%); }
+.footer-cta h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 32px; }
+
+/* Footer */
+footer { padding: 40px 24px; border-top: 1px solid var(--border-subtle); text-align: center; }
+.footer-links { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+.footer-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; }
+.footer-links a:hover { color: var(--accent-secondary); }
+.footer-copy { color: var(--text-muted); font-size: 0.82rem; }
+
+/* Reveal */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s, transform 0.6s; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 640px) { section { padding: 64px 0; } }
+</style>
+</head>
+<body>
+
+<div class="lang-toggle">
+  <button id="btn-en" onclick="setLang('en', true)">EN</button>
+  <button id="btn-zh" onclick="setLang('zh', true)">中文</button>
+</div>
+
+<!-- Hero -->
+<header class="hero">
+  <span class="hero-badge" data-en="Early access · Now open" data-zh="内测阶段 · 现已开放">内测阶段 · 现已开放</span>
+  <h1 data-en="Hand your routine digital work to an AI workflow team" data-zh="把你的日常数字工作，交给一支 AI 工作流团队">把你的日常数字工作，交给一支 AI 工作流团队</h1>
+  <p class="hero-subtitle" data-en="yozbon is an AI workflow automation tool. With your authorization, it automates routine digital tasks — development, testing, design and copywriting — so you can focus on decisions, not repetitive work. Subscribe monthly, cancel anytime." data-zh="yozbon 是一款 AI 工作流自动化工具。在你的授权下，它自动完成开发、测试、设计与文案等日常数字任务，让你专注于决策，而不是重复劳动。按月订阅，随时取消。">yozbon 是一款 AI 工作流自动化工具。在你的授权下，它自动完成开发、测试、设计与文案等日常数字任务，让你专注于决策，而不是重复劳动。按月订阅，随时取消。</p>
+  <a class="cta-btn" href="#pricing" data-en="Request early access" data-zh="申请内测名额">申请内测名额</a>
+</header>
+
+<!-- Features -->
+<section>
+  <div class="container">
+    <h2 class="section-title reveal" data-en="What it can do for you" data-zh="它能帮你做什么">它能帮你做什么</h2>
+    <p class="section-lead reveal" data-en="A set of automatable capabilities you can chain into reusable workflows." data-zh="一组可自动化的能力，可以串联成你可复用的工作流。">一组可自动化的能力，可以串联成你可复用的工作流。</p>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon">🛠️</div>
+        <h3 data-en="Automated development" data-zh="自动开发">自动开发</h3>
+        <p data-en="Generate, modify and debug code from your requirement descriptions." data-zh="根据你的需求描述，自动生成、修改和调试代码。">根据你的需求描述，自动生成、修改和调试代码。</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🧪</div>
+        <h3 data-en="Automated testing" data-zh="自动测试">自动测试</h3>
+        <p data-en="Run regression and smoke tests automatically, with clear reports." data-zh="自动运行回归与冒烟测试，并生成清晰的测试报告。">自动运行回归与冒烟测试，并生成清晰的测试报告。</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🎨</div>
+        <h3 data-en="Design & content" data-zh="设计与内容">设计与内容</h3>
+        <p data-en="Draft UI mockups and first-pass product or marketing copy." data-zh="生成界面设计稿，以及产品或营销文案初稿。">生成界面设计稿，以及产品或营销文案初稿。</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🔗</div>
+        <h3 data-en="Workflow orchestration" data-zh="流程编排">流程编排</h3>
+        <p data-en="Chain multiple AI capabilities into reusable automation pipelines." data-zh="把多个 AI 能力串成可复用的自动化流水线。">把多个 AI 能力串成可复用的自动化流水线。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section style="background: var(--bg-secondary);">
+  <div class="container">
+    <h2 class="section-title reveal" data-en="How it works" data-zh="如何使用">如何使用</h2>
+    <p class="section-lead reveal" data-en="Four steps from idea to deliverable." data-zh="从想法到交付，只需四步。">从想法到交付，只需四步。</p>
+    <div class="steps-grid">
+      <div class="step reveal">
+        <div class="step-num">1</div>
+        <h3 data-en="Pick a template" data-zh="选择模板">选择模板</h3>
+        <p data-en="Start from a ready-made workflow for the task you have." data-zh="从现成的工作流模板开始，匹配你手上的任务。">从现成的工作流模板开始，匹配你手上的任务。</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">2</div>
+        <h3 data-en="Authorize & configure" data-zh="授权与配置">授权与配置</h3>
+        <p data-en="Grant scoped access and set the parameters you care about." data-zh="授予最小范围的权限，并设置你在意的参数。">授予最小范围的权限，并设置你在意的参数。</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">3</div>
+        <h3 data-en="It runs for you" data-zh="自动运行">自动运行</h3>
+        <p data-en="The workflow executes the routine work in the background." data-zh="工作流在后台自动完成重复性工作。">工作流在后台自动完成重复性工作。</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">4</div>
+        <h3 data-en="Get deliverables" data-zh="接收交付">接收交付</h3>
+        <p data-en="Review the output and ship it. You stay in control throughout." data-zh="复核输出并交付。全程你始终掌握控制权。">复核输出并交付。全程你始终掌握控制权。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Why -->
+<section>
+  <div class="container">
+    <h2 class="section-title reveal" data-en="Why yozbon" data-zh="为什么选择 yozbon">为什么选择 yozbon</h2>
+    <p class="section-lead reveal" data-en="Compared to hiring help or doing it all by hand." data-zh="与找人帮忙或纯手动操作相比。">与找人帮忙或纯手动操作相比。</p>
+    <div class="comparison-wrap reveal">
+      <table class="comparison">
+        <thead>
+          <tr>
+            <th data-en="Dimension" data-zh="维度">维度</th>
+            <th data-en="By hand" data-zh="纯手动">纯手动</th>
+            <th data-en="Manual outsourcing" data-zh="人工外包">人工外包</th>
+            <th class="hl" data-en="yozbon" data-zh="yozbon">yozbon</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-en="Availability" data-zh="可用时间">可用时间</td>
+            <td data-en="Limited to your hours" data-zh="受限于你的时间">受限于你的时间</td>
+            <td data-en="Depends on the vendor" data-zh="取决于供应商">取决于供应商</td>
+            <td class="hl" data-en="Always on" data-zh="全天候待命">全天候待命</td>
+          </tr>
+          <tr>
+            <td data-en="Repetitive tasks" data-zh="重复任务">重复任务</td>
+            <td data-en="You do it all" data-zh="全部自己来">全部自己来</td>
+            <td data-en="Re-explain each time" data-zh="每次重新沟通">每次重新沟通</td>
+            <td class="hl" data-en="Automated and reusable" data-zh="自动且可复用">自动且可复用</td>
+          </tr>
+          <tr>
+            <td data-en="Scaling up" data-zh="扩展能力">扩展能力</td>
+            <td data-en="Hard to scale" data-zh="难以扩展">难以扩展</td>
+            <td data-en="Slow and costly" data-zh="慢且成本高">慢且成本高</td>
+            <td class="hl" data-en="Parallel workflows" data-zh="可并行工作流">可并行工作流</td>
+          </tr>
+          <tr>
+            <td data-en="Your role" data-zh="你的角色">你的角色</td>
+            <td data-en="Operator" data-zh="执行者">执行者</td>
+            <td data-en="Coordinator" data-zh="协调者">协调者</td>
+            <td class="hl" data-en="Decision maker" data-zh="决策者">决策者</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section id="pricing" style="background: var(--bg-secondary);">
+  <div class="container">
+    <h2 class="section-title reveal" data-en="Simple subscription" data-zh="简单的订阅方式">简单的订阅方式</h2>
+    <p class="section-lead reveal" data-en="Monthly billing. Cancel anytime. No hidden fees." data-zh="按月计费，随时取消，没有隐藏费用。">按月计费，随时取消，没有隐藏费用。</p>
+    <div class="pricing-grid">
+      <div class="price-card reveal">
+        <h3 data-en="Early Access" data-zh="内测版">内测版</h3>
+        <div class="price-tag" data-en="Free<span> / during beta</span>" data-zh="免费<span> · 内测期</span>">免费<span> · 内测期</span></div>
+        <ul>
+          <li data-en="Limited seats during beta" data-zh="内测期间名额有限">内测期间名额有限</li>
+          <li data-en="Core workflow templates" data-zh="核心工作流模板">核心工作流模板</li>
+          <li data-en="Community support" data-zh="社区支持">社区支持</li>
+        </ul>
+        <a class="cta-btn" href="#" style="padding:12px 28px;font-size:0.95rem;" data-en="Request access" data-zh="申请名额">申请名额</a>
+      </div>
+      <div class="price-card featured reveal">
+        <h3 data-en="Pro (coming soon)" data-zh="专业版（即将推出）">专业版（即将推出）</h3>
+        <div class="price-tag" data-en="Per seat<span> / month</span>" data-zh="按席位<span> · 每月</span>">按席位<span> · 每月</span></div>
+        <ul>
+          <li data-en="All workflow templates" data-zh="全部工作流模板">全部工作流模板</li>
+          <li data-en="Custom automations" data-zh="自定义自动化">自定义自动化</li>
+          <li data-en="Priority support" data-zh="优先支持">优先支持</li>
+          <li data-en="Higher usage limits" data-zh="更高的使用额度">更高的使用额度</li>
+        </ul>
+        <a class="cta-btn" href="#" style="padding:12px 28px;font-size:0.95rem;" data-en="Join waitlist" data-zh="加入等候名单">加入等候名单</a>
+      </div>
+    </div>
+    <p class="section-lead reveal" style="margin-top:36px;margin-bottom:0;font-size:0.85rem;max-width:720px;" data-en="Subscriptions renew automatically each billing cycle until you cancel. We email you before every renewal about the upcoming charge (at least 15-30 days before annual renewals). Cancel as easily as you signed up, right in your account. On your statement, the charge appears under the name of the payment provider that processes payments for us." data-zh="订阅将在每个计费周期自动续费，直至你取消。我们会在每次续费前以邮件提醒你即将产生的费用（年付至少提前 15–30 天）。取消与注册同样简单，直接在账户内操作即可。你的账单上，收款方将显示为为我们处理收款的支付服务商名称。">订阅将在每个计费周期自动续费，直至你取消。我们会在每次续费前以邮件提醒你即将产生的费用（年付至少提前 15–30 天）。取消与注册同样简单，直接在账户内操作即可。你的账单上，收款方将显示为为我们处理收款的支付服务商名称。</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section>
+  <div class="container">
+    <h2 class="section-title reveal" data-en="FAQ" data-zh="常见问题">常见问题</h2>
+    <p class="section-lead reveal" data-en="A few things people ask before trying yozbon." data-zh="大家在试用 yozbon 之前常问的几个问题。">大家在试用 yozbon 之前常问的几个问题。</p>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-question" data-en="Is this a subscription service?" data-zh="这是订阅服务吗？">这是订阅服务吗？</button>
+        <div class="faq-answer"><p data-en="Yes. yozbon is a software subscription. You pay a monthly fee for access to the workflow tool. During the beta, early access is free." data-zh="是的。yozbon 是一款软件订阅。你按月付费使用这个工作流工具。内测期间，内测名额免费。">是的。yozbon 是一款软件订阅。你按月付费使用这个工作流工具。内测期间，内测名额免费。</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" data-en="How does billing work - does it renew automatically?" data-zh="订阅如何计费，会自动续费吗？">订阅如何计费，会自动续费吗？</button>
+        <div class="faq-answer"><p data-en="Subscriptions renew automatically each billing cycle until you cancel. We email you before every renewal about the upcoming charge (at least 15-30 days before annual renewals). Cancelling is as easy as signing up - do it directly in your account, no phone call or email needed. On your card statement, the charge appears under the name of the payment provider that processes payments for us." data-zh="订阅会在每个计费周期自动续费，直至你取消。我们会在每次续费前以邮件提醒你即将产生的费用（年付至少提前 15–30 天）。取消与注册同样简单，直接在账户内操作即可，无需致电或发送邮件。你的卡账单上，收款方将显示为为我们处理收款的支付服务商名称。">订阅会在每个计费周期自动续费，直至你取消。我们会在每次续费前以邮件提醒你即将产生的费用（年付至少提前 15–30 天）。取消与注册同样简单，直接在账户内操作即可，无需致电或发送邮件。你的卡账单上，收款方将显示为为我们处理收款的支付服务商名称。</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" data-en="Is my data safe?" data-zh="我的数据安全吗？">我的数据安全吗？</button>
+        <div class="faq-answer"><p data-en="You grant only the access a workflow needs, and you can revoke it at any time. See our privacy policy for details on how data is handled." data-zh="你只为某个工作流授予它所需的最小权限，并可随时撤销。数据处理方式详见我们的隐私政策。">你只为某个工作流授予它所需的最小权限，并可随时撤销。数据处理方式详见我们的隐私政策。</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" data-en="How do I join the beta?" data-zh="内测怎么参加？">内测怎么参加？</button>
+        <div class="faq-answer"><p data-en="Request an early-access seat from this page. We onboard in small batches and will email you when a seat opens." data-zh="在本页申请内测名额。我们分批开放，有名额时会通过邮件通知你。">在本页申请内测名额。我们分批开放，有名额时会通过邮件通知你。</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question" data-en="Can I cancel anytime?" data-zh="可以随时取消吗？">可以随时取消吗？</button>
+        <div class="faq-answer"><p data-en="Yes. Subscriptions are month to month and you can cancel at any time from your account." data-zh="可以。订阅按月生效，你可以随时在账户中取消。">可以。订阅按月生效，你可以随时在账户中取消。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Compliance -->
+<section class="compliance">
+  <div class="container">
+    <div class="compliance-box reveal">
+      <p data-en="yozbon is currently in beta. AI output may contain errors — please review results before use. yozbon does not engage in financial, payment, or money-transmission services, and the services provided do not constitute investment, legal, or financial advice. Use is subject to our Terms and Privacy Policy." data-zh="yozbon 目前处于内测阶段，AI 输出可能存在误差，请在人工复核后再使用。yozbon 不从事任何金融、支付或资金结算业务，所提供的服务不构成投资、法律或财务建议。使用本服务受我们的服务条款与隐私政策约束。">yozbon 目前处于内测阶段，AI 输出可能存在误差，请在人工复核后再使用。yozbon 不从事任何金融、支付或资金结算业务，所提供的服务不构成投资、法律或财务建议。使用本服务受我们的服务条款与隐私政策约束。</p>
+    </div>
+  </div>
+</section>
+
+<!-- Footer CTA -->
+<section class="footer-cta">
+  <h2 class="reveal" data-en="Automate the busywork. Keep the decisions." data-zh="把重复劳动交给 AI，把决策留给自己。">把重复劳动交给 AI，把决策留给自己。</h2>
+  <a class="cta-btn reveal" href="#pricing" data-en="Request early access" data-zh="申请内测名额">申请内测名额</a>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-links">
+    <a href="/legal/terms.html" data-en="Terms" data-zh="服务条款">服务条款</a>
+    <a href="/legal/privacy.html" data-en="Privacy" data-zh="隐私政策">隐私政策</a>
+    <a href="/legal/disclaimer.html" data-en="Disclaimer" data-zh="免责声明">免责声明</a>
+    <a href="/legal/moderation.html" data-en="Content & Safety" data-zh="内容与审核">内容与审核</a>
+    <a href="mailto:support@runversehub.com" data-en="Contact" data-zh="联系客服">联系客服</a>
+  </div>
+  <p class="footer-copy" data-en="© 2026 yozbon. An AI workflow automation tool." data-zh="© 2026 yozbon。一款 AI 工作流自动化工具。">© 2026 yozbon。一款 AI 工作流自动化工具。</p>
+  <p class="footer-copy" style="margin-top:8px;" data-en="Operated by Nanjing Chuman Information Technology Co., Ltd. · Support: support@runversehub.com · Month-to-month, cancel anytime; unused credits refundable within 14 days. Payments, applicable taxes and chargebacks are handled by our licensed payment provider as Merchant of Record." data-zh="由南京楚曼信息科技有限公司（Nanjing Chuman Information Technology Co., Ltd.）运营 · 客服邮箱：support@runversehub.com · 按月计费、随时取消，未消耗积分 14 天内可退款；付款、适用税费与拒付由持牌支付服务商作为商户记录方（Merchant of Record）处理。">由南京楚曼信息科技有限公司（Nanjing Chuman Information Technology Co., Ltd.）运营 · 客服邮箱：support@runversehub.com · 按月计费、随时取消，未消耗积分 14 天内可退款；付款、适用税费与拒付由持牌支付服务商作为商户记录方（Merchant of Record）处理。</p>
+</footer>
+
+<script>
+// Language Toggle
+let currentLang = 'zh';
+
+function setLang(lang, persist) {
+  currentLang = lang;
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('btn-zh').classList.toggle('active', lang === 'zh');
+  document.querySelectorAll('[data-en]').forEach(el => {
+    el.innerHTML = el.getAttribute('data-' + lang);
+  });
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  if (persist) { try { localStorage.setItem('lang', lang); } catch (e) {} }
+}
+
+// 语言自动判定：与国内 React 站同一套逻辑（web/src/i18n/index.jsx defaultLang）——
+// ① 用户手动切换过则记忆优先；② 否则按浏览器语言：中文(国内访问)默认中文，其余(国外)默认英文。
+function detectLang() {
+  try {
+    const saved = localStorage.getItem('lang');
+    if (saved === 'zh' || saved === 'en') return saved;
+  } catch (e) {}
+  const nav = ((navigator.languages && navigator.languages[0]) || navigator.language || '').toLowerCase();
+  return nav.startsWith('zh') ? 'zh' : 'en';
+}
+
+document.addEventListener('DOMContentLoaded', () => setLang(detectLang()));
+
+// FAQ Accordion
+document.querySelectorAll('.faq-question').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item = btn.parentElement;
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+  });
+});
+
+// Reveal on scroll
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
