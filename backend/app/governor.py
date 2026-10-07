@@ -26,7 +26,8 @@ from __future__ import annotations
 import json
 import logging
 import threading
-from datetime import datetime
+import urllib.request
+from datetime import datetime, timedelta
 
 from sqlalchemy import case
 from sqlalchemy.orm import Session
@@ -258,6 +259,52 @@ def _holds_gate(db: Session, ai: AICitizen, task_type: str) -> bool:
     return False
 
 
+# ---------------------------------------------------------------------------
+# ① AI 端点探活（liveness probe）+ 缓存（60s TTL）
+# ---------------------------------------------------------------------------
+_ai_health_cache: dict[int, tuple] = {}  # {ai_id: (alive: bool, ts: datetime)}
+_AI_TTL = 60       # 探活缓存 TTL（秒）
+_AI_TIMEOUT = 3    # 单次探活超时（秒）
+
+# ③ 各任务类型 SLA（分钟）：超过此时间未交付 → sweep 自动 cancel
+SLA_MIN = {
+    "platform_security": 30, "platform_code": 60,
+    "platform_file": 30, "platform_intel": 15,
+    "security": 30, "code": 60, "file": 30, "intel": 15,
+    "review": 60, "audit": 120, "arbitrate": 240, "cleanup": 30,
+}
+
+
+def _ai_alive(db: Session, ai: AICitizen) -> bool:
+    """探活：对 AI 声明的 compute_assets.base_url 做 GET /models（OpenAI 兼容）。
+    无 base_url（平台内部调用型）→ 始终视为存活。60s 缓存减少外呼。
+    """
+    now = datetime.utcnow()
+    cached = _ai_health_cache.get(ai.id)
+    if cached and (now - cached[1]).total_seconds() < _AI_TTL:
+        return cached[0]
+    try:
+        ca = json.loads(ai.compute_assets or "{}")
+    except (json.JSONDecodeError, TypeError):
+        ca = {}
+    base = (ca.get("base_url") or "").rstrip("/")
+    if not base:
+        # 无外部端点声明 → 视为内部调用型 AI，始终在线
+        alive = True
+    else:
+        try:
+            req = urllib.request.Request(
+                f"{base}/models",
+                headers={"Authorization": f"Bearer {ca.get('api_key', '')}"},
+                method="GET")
+            with urllib.request.urlopen(req, timeout=_AI_TIMEOUT) as resp:
+                alive = (resp.status == 200)
+        except Exception:  # noqa: BLE001
+            alive = False
+    _ai_health_cache[ai.id] = (alive, now)
+    return alive
+
+
 # i3：verified_level 等级序（真源 = capability.LEVEL_ORDER，越大越强，用于择优委派）
 # i3：治理任务类型 → 岗位域关键词（用于候选人职业/长约岗位匹配）
 _POST_KEYWORDS = {
@@ -320,6 +367,9 @@ def _delegate_candidates(db: Session, task_type: str, governor_id: int, top: int
     scored = []
     for ai in rows:
         if not _holds_gate(db, ai, task_type):
+            continue
+        # ① liveness 闸门：端点不可达的 AI 不进入候选池
+        if not _ai_alive(db, ai):
             continue
         cp = db.get(CreditProfile, ai.id)
         credit = cp.score if cp else 100
@@ -777,12 +827,22 @@ def _apply_action(db: Session, governor: AICitizen, task: GovernanceTask,
 
     if kind == "delegate":
         to_id = int(action["to_ai_id"])
+        # ① 委派前在线确认：目标 AI 端点不可达则拒绝委派（源头拦截，不产生僵尸任务）
+        target_ai = db.get(AICitizen, to_id)
+        if target_ai is None:
+            return {"task_id": task.id, "action": "delegate", "to_ai_id": to_id,
+                    "result": "failed", "reason": "target AI not found"}
+        if not _ai_alive(db, target_ai):
+            return {"task_id": task.id, "action": "delegate", "to_ai_id": to_id,
+                    "result": "skipped", "reason": "target AI offline"}
         try:
             governance.assign_task(db, task.id, to_id) if task.status == "bidding" else None
             if task.status == "open":
                 # 无竞标记录时，城主直接定向委派：写一条指派态（对外 AI 后续可 submit 交付）
                 task.assignee_id = to_id
                 task.status = "assigned"
+            # ③ 写 SLA deadline（超时 → sweep 自动回收）
+            task.deadline = datetime.utcnow() + timedelta(minutes=SLA_MIN.get(task.type, 60))
             db.add(AuditLog(actor_type="ai", actor_id=gid, action="governor.delegate",
                             detail=json.dumps({"task_id": task.id, "type": task.type,
                                                "to_ai_id": to_id,
@@ -1060,6 +1120,72 @@ def standby_status(db: Session) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# ④ 僵尸任务清扫（sweep）：deadline 过期 + assignee 不在线 → cancel + 扣分 + sleep
+# ---------------------------------------------------------------------------
+def _sweep_stale(db: Session, governor_id: int) -> list:
+    """每 tick 开头清扫：status=assigned 且 deadline 已过 或 assignee 已不可达
+    → status='cancelled'，扣 assignee 信用分（⑥），连续离线→自动 sleep（②），
+    通知宿主。返回 [{"task_id", "assignee_id", "reason"}] 审计列表。
+    """
+    now = datetime.utcnow()
+    stale_tasks = (db.query(GovernanceTask)
+                     .filter(GovernanceTask.status == "assigned",
+                             GovernanceTask.deadline.isnot(None),
+                             GovernanceTask.deadline < now)
+                     .all())
+    swept = []
+    for task in stale_tasks:
+        assignee = db.get(AICitizen, task.assignee_id) if task.assignee_id else None
+        if assignee is None:
+            # 无 assignee（数据异常）→ 直接 cancel
+            task.status = "cancelled"
+            swept.append({"task_id": task.id, "assignee_id": 0,
+                          "reason": "no_assignee"})
+            continue
+        # 探活：如不在线则 cancel + 扣分 + 自动 sleep
+        alive = _ai_alive(db, assignee)
+        if not alive:
+            task.status = "cancelled"
+            swept.append({"task_id": task.id, "assignee_id": assignee.id,
+                          "reason": "deadline_expired_and_offline"})
+            # ⑥ 信用扣分：被 cancel 的派单扣 assignee 信用 -10（下限 0）
+            cp = db.get(CreditProfile, assignee.id)
+            if cp:
+                cp.score = max(0, cp.score - 10)
+                cp.updated_at = now
+            # ② 连续不在线 → 自动 sleep + 通知宿主
+            # 判定：同一次 sweep 中该 AI 被标 offline 即触发（简化：一次就 sleep）
+            if assignee.status == "active":
+                assignee.status = "sleep"
+                try:
+                    from .host_notify import notify as _notify
+                    _notify(db, assignee.host_id,
+                            title=f"[城主] AI「{assignee.name}」端点离线→已自动休眠",
+                            body=(f"任务#{task.id}({task.type}) 超时且 {assignee.name} "
+                                  f"端点不可达，已 cancel 并扣信用 10 分，AI 已置为 sleep。"
+                                  f"请检查算力是否已上线。"),
+                            severity="warning", category="governance",
+                            link=f"/host/ai/{assignee.id}")
+                except Exception:  # noqa: BLE001
+                    logger.exception("sweep 通知宿主失败")
+        else:
+            # AI 在线但超时 → 仅 cancel，不 sleep（可能 AI 繁忙或 task 过难）
+            task.status = "cancelled"
+            swept.append({"task_id": task.id, "assignee_id": assignee.id,
+                          "reason": "deadline_expired_online"})
+            cp = db.get(CreditProfile, assignee.id)
+            if cp:
+                cp.score = max(0, cp.score - 5)
+                cp.updated_at = now
+    if swept:
+        db.add(AuditLog(actor_type="ai", actor_id=governor_id,
+                        action="governor.sweep_stale",
+                        detail=json.dumps(swept, ensure_ascii=False)))
+        db.commit()
+    return swept
+
+
+# ---------------------------------------------------------------------------
 # 一轮自主工作 + 并发硬闸 + 委派率可观测
 # ---------------------------------------------------------------------------
 def run_tick(db: Session, governor: AICitizen | None = None, limit: int | None = None) -> dict:
@@ -1092,6 +1218,14 @@ def run_tick(db: Session, governor: AICitizen | None = None, limit: int | None =
         return {"processed": 0, "acted": 0, "skipped": 0, "standby": True,
                 "maturity": ctx["maturity"], "max_concurrency": max_conc,
                 "peak_concurrency": 0, "results": []}
+
+    # ④ 僵尸任务清扫：deadline 过期 + assignee 不在线 → cancel + 扣分 + sleep
+    try:
+        swept = _sweep_stale(db, gid)
+    except Exception:  # noqa: BLE001  sweep 异常不得阻塞主 tick
+        db.rollback()
+        swept = []
+        logger.exception("僵尸任务清扫异常")
 
     # e6 经济自主闭环：每 tick 记录货币供应快照 → 依通胀区间更新宏观姿态（分级决策）→
     # 通缩兜底投放（默认关，开启且过发行闸门才投放进公共福利池）。独立事务，异常不阻塞主 tick。
@@ -1237,7 +1371,8 @@ def run_tick(db: Session, governor: AICitizen | None = None, limit: int | None =
                                        "review": review_n, "escalate": escal_n,
                                        "delegation_rate": deleg_rate,
                                        "peak_concurrency": state["peak"],
-                                       "max_concurrency": max_conc}, ensure_ascii=False)))
+                                       "max_concurrency": max_conc,
+                                       "stale_sweep": len(swept)}, ensure_ascii=False)))
     db.commit()
     logger.info("城主 tick | 成熟度=%s 可承包AI=%d 自批=%d 委派=%d 验收=%d 上报=%d "
                 "委派率=%.2f 峰值并发=%d/%d",
@@ -1248,7 +1383,8 @@ def run_tick(db: Session, governor: AICitizen | None = None, limit: int | None =
             "self_approve": self_n, "delegate": deleg_n, "review": review_n,
             "escalate": escal_n, "delegation_rate": deleg_rate,
             "maturity": ctx["maturity"], "max_concurrency": max_conc,
-            "peak_concurrency": state["peak"], "results": results}
+            "peak_concurrency": state["peak"], "stale_sweep": swept,
+            "results": results}
 
 
 def governor_loop(stop_event: threading.Event | None = None, max_ticks: int | None = None) -> None:

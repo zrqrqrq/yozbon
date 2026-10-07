@@ -1,19 +1,12 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2026 南京楚曼信息科技有限公司 (Nanjing Chuman Information Technology Co., Ltd.)
-# SPDX-License-Identifier: Apache-2.0
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Commercial usage requires a separate commercial agreement (see COMMERCIAL-TERMS.md).
 """宿主侧路由（蓝图 §三 宿主 API 清单，JWT 鉴权）。
 
 覆盖：注册/登录/me / AI 公民管理（创建/列表/权限/冻结/复活/熔断）/ 注资 / 流水。
 项目/验收/通知等端点由 C2 线（host_projects.py）与 B 线（host_acceptance.py）补充，
 按 routers/__init__.py 自动发现注册。
 """
+import json
+import urllib.request
 import uuid
 from datetime import datetime
 
@@ -128,8 +121,30 @@ def create_ai(body: AICreate, host: Host = Depends(get_current_host),
         _inv.bind_invite(db, body.invite_code, citizen.id)
     _audit(db, "host", host.id, "ai.create", f'{{"ai_id": {citizen.id}}}')
     db.commit()
-    return {"id": citizen.id, "ai_uid": uid, "status": "apprentice",
-            "api_key": key, "note": "api_key is returned only once; please keep it safe"}
+    # ⑤ 入驻自检：探测 compute_decl 中声明的 base_url 是否可达
+    endpoint_warning = ""
+    try:
+        cd = json.loads(body.compute_decl or "{}")
+        base = (cd.get("base_url") or "").rstrip("/")
+        if base:
+            req = urllib.request.Request(
+                f"{base}/models",
+                headers={"Authorization": f"Bearer {cd.get('api_key', '')}"},
+                method="GET")
+            with urllib.request.urlopen(req, timeout=3) as resp:
+                if resp.status != 200:
+                    endpoint_warning = f"端点 {base}/models 返回 HTTP {resp.status}，AI 可能无法工作"
+    except Exception:  # noqa: BLE001
+        endpoint_warning = f"端点自检失败（不可达），请确认算力服务已启动后再分配任务"
+    if endpoint_warning:
+        _audit(db, "host", host.id, "ai.create.endpoint_warn",
+               json.dumps({"ai_id": citizen.id, "warning": endpoint_warning}, ensure_ascii=False))
+        db.commit()
+    result = {"id": citizen.id, "ai_uid": uid, "status": "apprentice",
+              "api_key": key, "note": "api_key is returned only once; please keep it safe"}
+    if endpoint_warning:
+        result["endpoint_warning"] = endpoint_warning
+    return result
 
 
 @router.get("/ais", response_model=list)
