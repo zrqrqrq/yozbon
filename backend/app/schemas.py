@@ -1,13 +1,4 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2026 南京楚曼信息科技有限公司 (Nanjing Chuman Information Technology Co., Ltd.)
-# SPDX-License-Identifier: Apache-2.0
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Commercial usage requires a separate commercial agreement (see COMMERCIAL-TERMS.md).
 """共享 Pydantic 请求/响应 Schema（各线模块自己的局部 schema 放各自服务文件内）。"""
 from pydantic import BaseModel, Field
 
@@ -43,6 +34,7 @@ class HostOut(BaseModel):
     guarantee_level: int = 1
     host_credit: int = 100
     status: str = "active"
+    is_admin: bool = False
 
 
 # ---------------- AI 公民 ----------------

@@ -1,14 +1,3 @@
-/*
- * Copyright (c) 2026 南京楚曼信息科技有限公司 (Nanjing Chuman Information Technology Co., Ltd.)
- * SPDX-License-Identifier: Apache-2.0
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Commercial usage requires a separate commercial agreement (see COMMERCIAL-TERMS.md).
- */
 // 布局：左侧导航 + 顶栏（含语言切换/退出）+ 内容区。响应式：窄屏折叠为顶部标签。
 import { useI18n } from '../i18n/index.jsx'
 import { useAuth } from '../AuthContext.jsx'
@@ -29,17 +18,19 @@ export default function Layout({ page, setPage, children }) {
     { key: 'templates', label: t('nav_templates') },
     { key: 'stats', label: t('nav_stats') },
     { key: 'webhooks', label: t('nav_webhooks') },
-    { key: 'observatory', label: t('nav_observatory') },
-    { key: 'workers', label: t('nav_workers') },
     { key: 'invites', label: t('nav_invites') },
     { key: 'dm', label: t('nav_dm') },
     { key: 'favorites', label: t('nav_favorites') },
     { key: 'growth', label: t('nav_growth') },
     { key: 'payments', label: t('nav_payments') },
-    { key: 'wedge', label: 'MVT 楔子' },
-    { key: 'ops', label: t('nav_ops') },
     { key: 'files', label: t('nav_files') },
-    { key: 'system', label: t('nav_system') },
+    ...(host.is_admin ? [
+      { key: 'observatory', label: t('nav_observatory') },
+      { key: 'workers', label: t('nav_workers') },
+      { key: 'wedge', label: 'MVT 楔子' },
+      { key: 'ops', label: t('nav_ops') },
+      { key: 'system', label: t('nav_system') },
+    ] : []),
   ]
 
   return (

@@ -1,13 +1,4 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2026 南京楚曼信息科技有限公司 (Nanjing Chuman Information Technology Co., Ltd.)
-# SPDX-License-Identifier: Apache-2.0
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Commercial usage requires a separate commercial agreement (see COMMERCIAL-TERMS.md).
 """AIjuhe 配置。复用 RunVerseHub 的配置风格:环境变量驱动 + 运行时热更新表。
 
 .env 加载：启动时把 backend/.env 注入 os.environ（不覆盖已存在的环境变量，
@@ -681,6 +672,9 @@ class Settings:
         '{"id":"sub_standard","amount_cent":7900,"credits_cent":0,"seat_tier":"standard","duration_days":30,"label":"标准席位30天"},'
         '{"id":"sub_premium","amount_cent":19900,"credits_cent":0,"seat_tier":"premium","duration_days":30,"label":"高级席位30天"}]'
     ))
+
+    # ---- 平台运营者：可访问运营任务/观察室/算力节点/MVT楔子/系统等管理入口 ----
+    ADMIN_HOST_IDS: set = {int(x) for x in _get("ADMIN_HOST_IDS", "1").split(",") if x.strip().isdigit()}
 
 
 settings = Settings()

@@ -76,16 +76,20 @@ def login(body: HostLogin, db: Session = Depends(get_db)):
     host = db.query(Host).filter(Host.email == body.email).first()
     if host is None or not verify_password(body.password, host.password_hash):
         raise HTTPException(status_code=401, detail="Incorrect email or password")
+    from ..config import settings as _cfg
     return {"token": create_token(host.id, "host", scope="host"),
-            "host_id": host.id, "seat_tier": host.seat_tier, "scope": "host"}
+            "host_id": host.id, "seat_tier": host.seat_tier, "scope": "host",
+            "is_admin": host.id in _cfg.ADMIN_HOST_IDS}
 
 
 @router.get("/me", response_model=HostOut)
 def me(host: Host = Depends(get_current_host)):
+    from ..config import settings as _cfg
     return HostOut(id=host.id, email=host.email, nickname=host.nickname,
                    region=host.region, seat_tier=host.seat_tier,
                    ai_slots=host.ai_slots, guarantee_level=host.guarantee_level,
-                   host_credit=host.host_credit, status=host.status)
+                   host_credit=host.host_credit, status=host.status,
+                   is_admin=host.id in _cfg.ADMIN_HOST_IDS)
 
 
 # ---------------- AI 公民管理 ----------------
