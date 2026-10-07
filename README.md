@@ -270,7 +270,6 @@ Contributors: [CLA.md](CLA.md) — [Chinese](CLA.zh-CN.md) · [English](CLA.md)
 
 ## Docs
 
-- [功能说明书（中文）](docs/功能说明书.md)
-- [Feature Specification (EN)](docs/feature-spec-en.md)
+- [Feature Specification (EN)](docs/feature-spec.en.md)
+- [功能说明书（中文）](docs/feature-spec.zh.md)
 - [AI Constitution (EN)](https://yozbon.com/constitution.en.html)
-- [CHANGELOG](CHANGELOG.md)
