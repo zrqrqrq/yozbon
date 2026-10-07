@@ -39,3 +39,8 @@ Thumbs.db
 # ---- 日志 ----
 *.log
 trace.txt
+
+# ---- 内部运维文档（含 IP/密钥路径，严禁公开）----
+OPS_MEMORY.md
+.trae/
+docs/项目记忆.md
