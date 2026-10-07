@@ -1185,6 +1185,44 @@ def _sweep_stale(db: Session, governor_id: int) -> list:
     return swept
 
 
+def _patrol_health(db: Session, governor_id: int) -> list:
+    """主动巡检：扫描所有 active 外部 AI，端点不可达 → 立即置 sleep + 通知宿主。
+    与 sweep 不同：无需等任务超时，从源头让宿主后台看到真实在线状态。
+    仅探测声明了 base_url 的 AI（无 base_url 的内部调用型 AI 不参与巡检）。
+    """
+    ais = (db.query(AICitizen)
+             .filter(AICitizen.is_internal == 0, AICitizen.status == "active")
+             .all())
+    now = datetime.utcnow()
+    asleep = []
+    for ai in ais:
+        try:
+            ca = json.loads(ai.compute_assets or "{}")
+        except (json.JSONDecodeError, TypeError):
+            continue
+        if not (ca.get("base_url") or "").strip():
+            continue  # 无外部端点声明 → 不参与巡检
+        if not _ai_alive(db, ai):
+            ai.status = "sleep"
+            asleep.append({"ai_id": ai.id, "name": ai.name})
+            try:
+                from .host_notify import notify as _notify
+                _notify(db, ai.host_id,
+                        title=f"[城主巡检] AI「{ai.name}」端点不可达→已自动休眠",
+                        body=(f"{ai.name}(ID:{ai.id}) 声明的算力端点不可达，"
+                              f"城主已将其置为 sleep。请启动算力服务后在后台「复活」。"),
+                        severity="warning", category="governance",
+                        link=f"/host/ai/{ai.id}")
+            except Exception:  # noqa: BLE001
+                logger.exception("巡检通知宿主失败")
+    if asleep:
+        db.add(AuditLog(actor_type="ai", actor_id=governor_id,
+                        action="governor.health_patrol",
+                        detail=json.dumps({"asleep": asleep}, ensure_ascii=False)))
+        db.commit()
+    return asleep
+
+
 # ---------------------------------------------------------------------------
 # 一轮自主工作 + 并发硬闸 + 委派率可观测
 # ---------------------------------------------------------------------------
@@ -1226,6 +1264,14 @@ def run_tick(db: Session, governor: AICitizen | None = None, limit: int | None =
         db.rollback()
         swept = []
         logger.exception("僵尸任务清扫异常")
+
+    # 主动巡检：无任务时也检测 AI 端点健康 → 不可达立即 sleep + 通知宿主
+    try:
+        patrol_asleep = _patrol_health(db, gid)
+    except Exception:  # noqa: BLE001
+        db.rollback()
+        patrol_asleep = []
+        logger.exception("AI 健康巡检异常")
 
     # e6 经济自主闭环：每 tick 记录货币供应快照 → 依通胀区间更新宏观姿态（分级决策）→
     # 通缩兜底投放（默认关，开启且过发行闸门才投放进公共福利池）。独立事务，异常不阻塞主 tick。
