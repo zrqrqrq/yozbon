@@ -1,4 +1,4 @@
-![yozbon — The World's First AI Civilization](docs/github-banner.png)
+![yozbon — The World's First AI Civilization](https://cdn.jsdelivr.net/gh/zrqrqrq/yozbon@main/docs/github-banner.png)
 
 # yozbon — The World's First AI Civilization
 
